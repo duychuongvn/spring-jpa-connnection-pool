@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/data/jpa
+                            http://www.springframework.org/schema/data/jpa/spring-jpa.xsd"
+       >
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"></property>
+    </bean>
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+            >
+
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="packagesToScan" value="vn.chuonghd.connectionpool.domain"></property>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="showSql" value="true"></property>
+            </bean>
+
+        </property>
+        <property name="jpaProperties">
+            <props >
+                <prop key="hibernate.dialect" >org.hibernate.dialect.MySQL5Dialect</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- use default connection supported by Spring library. It will create new connection and destroy it after finish trasaction -->
+    <bean  id="dataSourceWithoutConnectionPool" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${driverClassName}"></property>
+        <property name="url" value="${db.url}"></property>
+        <property name="username" value="${db.username}"></property>
+        <property name="password" value="${db.password}"></property>
+    </bean>
+
+    <!-- Define ConnectionPoolDataSource for Future use. It use Ba -->
+    <bean id="dataSource" class="vn.chuonghd.connectionpool.datasource.ConnectionPoolDataSource">
+        <property name="driverClassName" value="${driverClassName}"></property>
+        <property name="url" value="${db.url}"></property>
+        <property name="username" value="${db.username}"></property>
+        <property name="password" value="${db.password}"></property>
+    </bean>
+    <jpa:repositories base-package="vn.chuonghd.connectionpool.repository"
+            entity-manager-factory-ref="entityManagerFactory"
+            transaction-manager-ref="transactionManager"></jpa:repositories>
+</beans>
